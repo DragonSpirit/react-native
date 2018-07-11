@@ -147,6 +147,7 @@ public class ReactImageView extends GenericDraweeView {
 
   private @Nullable ImageSource mImageSource;
   private @Nullable ImageSource mCachedImageSource;
+  private @Nullable Drawable mDefaultImageDrawable;
   private @Nullable Drawable mLoadingImageDrawable;
   private int mBorderColor;
   private int mOverlayColor;
@@ -313,6 +314,11 @@ public class ReactImageView extends GenericDraweeView {
     mIsDirty = true;
   }
 
+   public void setDefaultSource(@Nullable String name) {
+     mDefaultImageDrawable = ResourceDrawableIdHelper.getInstance().getResourceDrawable(getContext(), name);
+     mIsDirty = true;
+   }
+
   public void setLoadingIndicatorSource(@Nullable String name) {
     Drawable drawable = ResourceDrawableIdHelper.getInstance().getResourceDrawable(getContext(), name);
     mLoadingImageDrawable =
@@ -366,6 +372,10 @@ public class ReactImageView extends GenericDraweeView {
 
     GenericDraweeHierarchy hierarchy = getHierarchy();
     hierarchy.setActualImageScaleType(mScaleType);
+
+    if (mDefaultImageDrawable != null) {
+      hierarchy.setPlaceholderImage(mDefaultImageDrawable, ScalingUtils.ScaleType.CENTER);
+    }
 
     if (mLoadingImageDrawable != null) {
       hierarchy.setPlaceholderImage(mLoadingImageDrawable, ScalingUtils.ScaleType.CENTER);

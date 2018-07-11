@@ -115,6 +115,10 @@ var Image = createReactClass({
     */
     blurRadius: PropTypes.number,
     /**
+     * See https://facebook.github.io/react-native/docs/image.html#defaultsource
+     */
+    defaultSource: PropTypes.number,
+    /**
      * similarly to `source`, this property represents the resource used to render
      * the loading indicator for the image, displayed until image is ready to be
      * displayed, typically after when it got downloaded from network.
@@ -260,6 +264,7 @@ var Image = createReactClass({
 
   render: function() {
     const source = resolveAssetSource(this.props.source);
+    const defaultSource = resolveAssetSource(this.props.defaultSource);
     const loadingIndicatorSource = resolveAssetSource(this.props.loadingIndicatorSource);
 
     // As opposed to the ios version, here we render `null` when there is no source, source.uri
@@ -275,6 +280,12 @@ var Image = createReactClass({
 
     if (this.props.children) {
       throw new Error('The <Image> component cannot contain children. If you want to render content on top of the image, consider using the <ImageBackground> component or absolute positioning.');
+    }
+
+    if (this.props.defaultSource && this.props.loadingIndicatorSource) {
+      throw new Error(
+        'The <Image> component cannot have defaultSource and loadingIndicatorSource at the same time. Please use either defaultSource or loadingIndicatorSource.',
+      );
     }
 
     if (source && (source.uri || Array.isArray(source))) {
@@ -295,6 +306,9 @@ var Image = createReactClass({
         shouldNotifyLoadEvents: !!(onLoadStart || onLoad || onLoadEnd || onError),
         src: sources,
         headers: source.headers,
+        defaultSrc: defaultSource
+          ? defaultSource.uri
+          : null,
         loadingIndicatorSrc: loadingIndicatorSource ? loadingIndicatorSource.uri : null,
       });
 
@@ -318,6 +332,7 @@ var cfg = {
   nativeOnly: {
     src: true,
     headers: true,
+    defaultSrc: true,
     loadingIndicatorSrc: true,
     shouldNotifyLoadEvents: true,
   },
